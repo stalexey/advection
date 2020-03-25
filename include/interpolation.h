@@ -2,13 +2,31 @@
 
 #include <grid.h>
 #include <utils.h>
+#include <string>
 
 enum class InterpolationType {
     Linear,
     CatmullRom,
     MonotonicCubicFedkiw,
-    MonotonicCubicFritschCarlson
+    MonotonicCubicFritschCarlson,
+    Last // dummy to indicate the end of list
 };
+
+std::string interpolationTypeToString(const InterpolationType& type)
+{
+    switch (type) {
+    case InterpolationType::Linear:
+        return "Linear";
+    case InterpolationType::CatmullRom:
+        return "CatmullRom";
+    case InterpolationType::MonotonicCubicFedkiw:
+        return "MonotonicCubicFedkiw";
+    case InterpolationType::MonotonicCubicFritschCarlson:
+        return "MonotonicCubicFritschCarlson";
+    default:
+        ASSERT(false);
+    }
+}
 
 template <class T>
 T interpolate(const GridData<T>& gridData, const T x,
@@ -30,6 +48,7 @@ T interpolate(const GridData<T>& gridData, const T x,
         // Reference implementation
         // https://www.paulinternet.nl/?page=bicubic
         // C^1 continuity, may exhibit high frequency oscillations
+        // NOTE: same as what is below without clamping or monotonicity fixes
 
         const T f0 = gridData.periodic(baseIndex - 1);
         const T f1 = gridData.periodic(baseIndex);
@@ -90,7 +109,8 @@ T interpolate(const GridData<T>& gridData, const T x,
     } break;
     case InterpolationType::MonotonicCubicFritschCarlson: {
         // From https://en.wikipedia.org/wiki/Monotone_cubic_interpolation
-        // C^0 continuity, monotonic, looks smooth, does not require clamping to end-points
+        // C^0 continuity, monotonic, looks smooth, does not require clamping to
+        // end-points
 
         const T f0 = gridData.periodic(baseIndex - 1);
         const T f1 = gridData.periodic(baseIndex);
@@ -101,7 +121,7 @@ T interpolate(const GridData<T>& gridData, const T x,
         const T c2 = c1 * alpha;
         const T c3 = c2 * alpha;
 
-        // clamping for non-monotonic regions        
+        // clamping for non-monotonic regions
         T dkm, dkp;
         T delta = f2 - f1;
         if (delta < 0) {
@@ -114,7 +134,7 @@ T interpolate(const GridData<T>& gridData, const T x,
             dkm = dkp = 0.0f;
         }
 
-        // clamping for monotonic regions        
+        // clamping for monotonic regions
         const T dk2 = dkm * dkm + dkp * dkp;
         const T delta2times9 = delta * delta * 9;
         if (dk2 > delta2times9) {

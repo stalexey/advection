@@ -3,7 +3,6 @@ From the project folder run:
 mkdir build
 cd build
 cmake ../
-cd src
 make
-source ./plotInterpolation.sh 
-source ./plotAdvection.sh 
+source ./tests/plotInterpolation.sh 
+source ./tests/plotAdvection.sh 

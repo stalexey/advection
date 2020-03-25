@@ -26,9 +26,11 @@ void initializeStep(GridData<T>& gridData)
     }
 }
 
-void run(const InterpolationType type, const std::string& fileName)
+void run(const InterpolationType type)
 {
-    std::cout << "Running advection for '" << fileName << "'" << std::endl;
+    std::string fileName =
+        std::string("advection") + interpolationTypeToString(type);
+    std::cout << "Running '" << fileName << "'" << std::endl;
 
     const T domainSize = 10.0f;
     const int samples = 500;
@@ -54,10 +56,8 @@ void run(const InterpolationType type, const std::string& fileName)
 
 int main()
 {
-    run(InterpolationType::Linear, "advectionLinear");
-    run(InterpolationType::CatmullRom, "advectionCatmullRom");
-    run(InterpolationType::MonotonicCubicFedkiw, "advectionMonotonicCubicFedkiw");
-    run(InterpolationType::MonotonicCubicFritschCarlson, "advectionMonotonicCubicFritschCarlson");
+    for (int i = 0; i < static_cast<int>(InterpolationType::Last); ++i)
+        run(static_cast<InterpolationType>(i));
 
     return 0;
 }

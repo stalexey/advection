@@ -56,7 +56,7 @@ int main()
 {
     run(InterpolationType::Linear, "interpolationLinear");
     run(InterpolationType::CatmullRom, "interpolationCatmullRom");
-    run(InterpolationType::MonotoneCubic, "interpolationMonotoneCubic");
+    run(InterpolationType::MonotonicCubic, "interpolationMonotonicCubic");
 
     return 0;
 }

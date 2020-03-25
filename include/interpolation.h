@@ -3,7 +3,11 @@
 #include <grid.h>
 #include <utils.h>
 
-enum class InterpolationType { Linear, CatmullRom, MonotoneCubic };
+enum class InterpolationType {
+    Linear,
+    CatmullRom,
+    MonotonicCubic
+};
 
 template <class T>
 T interpolate(const GridData<T>& gridData, const T x,
@@ -24,6 +28,7 @@ T interpolate(const GridData<T>& gridData, const T x,
     case InterpolationType::CatmullRom: {
         // Reference implementation
         // https://www.paulinternet.nl/?page=bicubic
+        // C^1 continuity, may exhibit high frequency oscillations
 
         const T p0 = gridData.periodic(baseIndex - 1);
         const T p1 = gridData.periodic(baseIndex);
@@ -34,9 +39,11 @@ T interpolate(const GridData<T>& gridData, const T x,
                           (p2 - p0 +
                            alpha * (2.0 * p0 - 5.0 * p1 + 4.0 * p2 - p3 +
                                     alpha * (3.0 * (p1 - p2) + p3 - p0)));
-
     } break;
-    case InterpolationType::MonotoneCubic: {
+    case InterpolationType::MonotonicCubic: {
+        // From "Visual Simulation of Smoke", Fedkiw et al, 2001
+        // C^0 continuity, monotonic
+
         const T f0 = gridData.periodic(baseIndex - 1);
         const T f1 = gridData.periodic(baseIndex);
         const T f2 = gridData.periodic(baseIndex + 1);

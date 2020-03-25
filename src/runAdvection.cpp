@@ -40,7 +40,7 @@ void run(InterpolationType type, std::string fileName)
     const T cfl = 6.3f;
     const T maxDt = grid.dx() * cfl / velocity;
 
-    const T finalTime = 15.0f;
+    const T finalTime = 1.0f;
     const int substeps = std::ceil(finalTime / maxDt);
     const T dt = finalTime / substeps;
     const T dx = dt * velocity;
@@ -56,7 +56,8 @@ int main()
 {
     run(InterpolationType::Linear, "interpolationLinear");
     run(InterpolationType::CatmullRom, "interpolationCatmullRom");
-    run(InterpolationType::MonotonicCubic, "interpolationMonotonicCubic");
+    run(InterpolationType::MonotonicCubicFedkiw, "interpolationMonotonicCubicFedkiw");
+    run(InterpolationType::MonotonicCubicFritschCarlson, "interpolationMonotonicCubicFritschCarlson");
 
     return 0;
 }

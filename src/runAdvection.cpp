@@ -31,16 +31,16 @@ void run(const InterpolationType type, const std::string& fileName)
     std::cout << "Running advection for '" << fileName << "'" << std::endl;
 
     const T domainSize = 10.0f;
-    const int samples = 200;
+    const int samples = 500;
     const Grid<T> grid(domainSize, samples);
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
     const T velocity = 5.0f;
-    const T cfl = 6.3f;
+    const T cfl = 0.25f;
     const T maxDt = grid.dx() * cfl / velocity;
 
-    const T finalTime = 1.0f;
+    const T finalTime = 4.0f;
     const int substeps = std::ceil(finalTime / maxDt);
     const T dt = finalTime / substeps;
     const T dx = dt * velocity;

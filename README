@@ -1,0 +1,9 @@
+From the project direction run:
+
+mkdir build
+cd build
+cmake ../
+cd src
+make
+source ./plotInterpolation.sh 
+source ./plotAdvection.sh 

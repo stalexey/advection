@@ -26,7 +26,7 @@ void initializeStep(GridData<T>& gridData)
     }
 }
 
-void run(InterpolationType type, std::string fileName)
+void run(const InterpolationType type, const std::string& fileName)
 {
     std::cout << "Running advection for '" << fileName << "'" << std::endl;
 
@@ -54,10 +54,10 @@ void run(InterpolationType type, std::string fileName)
 
 int main()
 {
-    run(InterpolationType::Linear, "interpolationLinear");
-    run(InterpolationType::CatmullRom, "interpolationCatmullRom");
-    run(InterpolationType::MonotonicCubicFedkiw, "interpolationMonotonicCubicFedkiw");
-    run(InterpolationType::MonotonicCubicFritschCarlson, "interpolationMonotonicCubicFritschCarlson");
+    run(InterpolationType::Linear, "advectionLinear");
+    run(InterpolationType::CatmullRom, "advectionCatmullRom");
+    run(InterpolationType::MonotonicCubicFedkiw, "advectionMonotonicCubicFedkiw");
+    run(InterpolationType::MonotonicCubicFritschCarlson, "advectionMonotonicCubicFritschCarlson");
 
     return 0;
 }

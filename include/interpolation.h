@@ -34,7 +34,7 @@ T interpolate(const GridData<T>& gridData, const T x,
         const T f0 = gridData.periodic(baseIndex - 1);
         const T f1 = gridData.periodic(baseIndex);
         const T f2 = gridData.periodic(baseIndex + 1);
-        const T f3 = gridData.periodic(baseIndex + 1);
+        const T f3 = gridData.periodic(baseIndex + 2);
 
         result = f1 + 0.5 * alpha *
                           (f2 - f0 +
@@ -48,7 +48,7 @@ T interpolate(const GridData<T>& gridData, const T x,
         const T f0 = gridData.periodic(baseIndex - 1);
         const T f1 = gridData.periodic(baseIndex);
         const T f2 = gridData.periodic(baseIndex + 1);
-        const T f3 = gridData.periodic(baseIndex + 1);
+        const T f3 = gridData.periodic(baseIndex + 2);
 
         const T c1 = alpha;
         const T c2 = c1 * alpha;
@@ -92,7 +92,7 @@ T interpolate(const GridData<T>& gridData, const T x,
         const T f0 = gridData.periodic(baseIndex - 1);
         const T f1 = gridData.periodic(baseIndex);
         const T f2 = gridData.periodic(baseIndex + 1);
-        const T f3 = gridData.periodic(baseIndex + 1);
+        const T f3 = gridData.periodic(baseIndex + 2);
 
         const T c1 = alpha;
         const T c2 = c1 * alpha;

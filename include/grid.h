@@ -20,7 +20,7 @@ public:
     T position(const int index) const { return (index + 0.5f) * m_dx; }
     void gridSpace(const T x, int& baseIndex, T& alpha) const
     {
-        const T gridSpaceX = x / m_dx;
+        const T gridSpaceX = x / m_dx - 0.5f;
         baseIndex = std::floor(gridSpaceX);
         alpha = gridSpaceX - baseIndex;
     }

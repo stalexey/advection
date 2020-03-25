@@ -105,7 +105,7 @@ T interpolate(const GridData<T>& gridData, const T x,
         } else {
             dkm = (f2 - f0) * 0.5f;
             dkp = (f3 - f1) * 0.5f;
-            if (delta * dkm < 0 || delta * dkp < 0) {
+            if (delta * dkm > 0 && delta * dkp > 0) {
                 const T dk2 = dkm * dkm + dkp * dkp;
                 const T delta2times9 = delta * delta * 9;
                 if (dk2 > delta2times9) {

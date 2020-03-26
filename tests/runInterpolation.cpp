@@ -1,12 +1,13 @@
-#include <fstream>
 #include <interpolation.h>
+
+#include <fstream>
 #include <iostream>
 #include <string>
 
 using T = double;
 
-void saveData(const GridData<T>& gridData, const InterpolationType type,
-              const int samples, std::string fileName)
+void
+saveData(const GridData<T>& gridData, const InterpolationType type, const int samples, std::string fileName)
 {
     std::ofstream file;
     file.open(fileName.append(".dat"));
@@ -19,10 +20,10 @@ void saveData(const GridData<T>& gridData, const InterpolationType type,
     file.close();
 }
 
-void run(const InterpolationType type)
+void
+run(const InterpolationType type)
 {
-    std::string fileName =
-        std::string("interpolation") + interpolationTypeToString(type);
+    std::string fileName = std::string("interpolation") + interpolationTypeToString(type);
     std::cout << "Running '" << fileName << "'" << std::endl;
 
     const T domainSize = 10.0f;
@@ -43,7 +44,8 @@ void run(const InterpolationType type)
     saveData(gridData, type, 1000, fileName);
 }
 
-int main()
+int
+main()
 {
     for (int i = 0; i < static_cast<int>(InterpolationType::Last); ++i)
         run(static_cast<InterpolationType>(i));

@@ -2,9 +2,11 @@
 
 #include <grid.h>
 #include <utils.h>
+
 #include <string>
 
-enum class InterpolationType {
+enum class InterpolationType
+{
     Linear,
     CatmullRom,
     MonotonicCubicFedkiw,
@@ -12,7 +14,8 @@ enum class InterpolationType {
     Last // dummy to indicate the end of list
 };
 
-std::string interpolationTypeToString(const InterpolationType& type)
+std::string
+interpolationTypeToString(const InterpolationType& type)
 {
     switch (type) {
     case InterpolationType::Linear:
@@ -29,8 +32,8 @@ std::string interpolationTypeToString(const InterpolationType& type)
 }
 
 template <class T>
-T interpolate(const GridData<T>& gridData, const T x,
-              const InterpolationType type)
+T
+interpolate(const GridData<T>& gridData, const T x, const InterpolationType type)
 {
     const Grid<T>& grid = gridData.grid();
     int baseIndex;
@@ -55,10 +58,10 @@ T interpolate(const GridData<T>& gridData, const T x,
         const T f2 = gridData.periodic(baseIndex + 1);
         const T f3 = gridData.periodic(baseIndex + 2);
 
-        result = f1 + 0.5 * alpha *
-                          (f2 - f0 +
-                           alpha * (2.0 * f0 - 5.0 * f1 + 4.0 * f2 - f3 +
-                                    alpha * (3.0 * (f1 - f2) + f3 - f0)));
+        result =
+            f1 + 0.5 * alpha *
+                     (f2 - f0 +
+                      alpha * (2.0 * f0 - 5.0 * f1 + 4.0 * f2 - f3 + alpha * (3.0 * (f1 - f2) + f3 - f0)));
     } break;
     case InterpolationType::MonotonicCubicFedkiw: {
         // From "Visual Simulation of Smoke", Fedkiw et al, 2001

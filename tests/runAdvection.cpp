@@ -1,11 +1,13 @@
 #include <advection.h>
+
 #include <fstream>
 #include <iostream>
 #include <string>
 
 using T = double;
 
-void saveData(const GridData<T>& gridData, std::string fileName)
+void
+saveData(const GridData<T>& gridData, std::string fileName)
 {
     std::ofstream file;
     file.open(fileName.append(".dat"));
@@ -15,7 +17,8 @@ void saveData(const GridData<T>& gridData, std::string fileName)
     file.close();
 }
 
-void initializeStep(GridData<T>& gridData)
+void
+initializeStep(GridData<T>& gridData)
 {
     for (int i = 0; i < gridData.size(); i++) {
         const T x = gridData.position(i);
@@ -26,10 +29,10 @@ void initializeStep(GridData<T>& gridData)
     }
 }
 
-void run(const InterpolationType type)
+void
+run(const InterpolationType type)
 {
-    std::string fileName =
-        std::string("advection") + interpolationTypeToString(type);
+    std::string fileName = std::string("advection") + interpolationTypeToString(type);
     std::cout << "Running '" << fileName << "'" << std::endl;
 
     const T domainSize = 10.0f;
@@ -47,14 +50,13 @@ void run(const InterpolationType type)
     const T dt = finalTime / substeps;
     const T dx = dt * velocity;
 
-    for (int i = 0; i < substeps; ++i) {
-        advect(gridData, dx, type);
-    }
+    for (int i = 0; i < substeps; ++i) { advect(gridData, dx, type); }
 
     saveData(gridData, fileName);
 }
 
-int main()
+int
+main()
 {
     for (int i = 0; i < static_cast<int>(InterpolationType::Last); ++i)
         run(static_cast<InterpolationType>(i));

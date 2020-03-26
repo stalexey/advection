@@ -8,7 +8,9 @@ class Grid
 {
 public:
     Grid(const T domainSize, const int samples)
-        : m_domainSize(domainSize), m_samples(samples), m_dx(domainSize / samples)
+        : m_domainSize(domainSize)
+        , m_samples(samples)
+        , m_dx(domainSize / samples)
     {
     }
     Grid(const Grid<T>& grid) = default;
@@ -35,7 +37,11 @@ template <class T>
 class GridData
 {
 public:
-    GridData(const Grid<T>& grid) : m_grid(grid), m_data(grid.samples(), T()) {}
+    GridData(const Grid<T>& grid)
+        : m_grid(grid)
+        , m_data(grid.samples(), T())
+    {
+    }
     GridData(const GridData<T>& gridData) = default;
 
     const Grid<T>& grid() const { return m_grid; }

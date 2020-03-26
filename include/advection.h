@@ -1,10 +1,12 @@
 #pragma once
 
 #include <interpolation.h>
+
 #include <iostream>
 
 template <class T>
-void advect(GridData<T>& gridData, const T dx, const InterpolationType type)
+void
+advect(GridData<T>& gridData, const T dx, const InterpolationType type)
 {
     const GridData<T> gridDataPrev(gridData);
     const Grid<T>& grid = gridData.grid();

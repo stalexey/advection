@@ -77,22 +77,22 @@ interpolate(const GridData<T>& gridData, const T x, const InterpolationType type
         const T c3 = c2 * alpha;
 
         // clamping for non-monotonic region
-        T dkm, dkp;
+        T dM, dP;
         T delta = f2 - f1;
         if (delta < 0) {
-            dkm = std::min((f2 - f0) * 0.5f, T(0.0f));
-            dkp = std::min((f3 - f1) * 0.5f, T(0.0f));
+            dM = std::min((f2 - f0) * 0.5f, T(0.0f));
+            dP = std::min((f3 - f1) * 0.5f, T(0.0f));
         } else if (delta > 0) {
-            dkm = std::max((f2 - f0) * 0.5f, T(0.0f));
-            dkp = std::max((f3 - f1) * 0.5f, T(0.0f));
+            dM = std::max((f2 - f0) * 0.5f, T(0.0f));
+            dP = std::max((f3 - f1) * 0.5f, T(0.0f));
         } else {
-            dkm = dkp = 0.0f;
+            dM = dP = 0.0f;
         }
 
         const T a0 = f1;
-        const T a1 = dkm;
-        const T a2 = 3.0f * delta - 2.0f * dkm - dkp;
-        const T a3 = dkm + dkp - 2.0f * delta;
+        const T a1 = dM;
+        const T a2 = 3.0f * delta - 2.0f * dM - dP;
+        const T a3 = dM + dP - 2.0f * delta;
 
         result = a3 * c3 + a2 * c2 + a1 * c1 + a0;
 
@@ -125,31 +125,31 @@ interpolate(const GridData<T>& gridData, const T x, const InterpolationType type
         const T c3 = c2 * alpha;
 
         // clamping for non-monotonic regions
-        T dkm, dkp;
+        T dM, dP;
         T delta = f2 - f1;
         if (delta < 0) {
-            dkm = std::min((f2 - f0) * 0.5f, T(0.0f));
-            dkp = std::min((f3 - f1) * 0.5f, T(0.0f));
+            dM = std::min((f2 - f0) * 0.5f, T(0.0f));
+            dP = std::min((f3 - f1) * 0.5f, T(0.0f));
         } else if (delta > 0) {
-            dkm = std::max((f2 - f0) * 0.5f, T(0.0f));
-            dkp = std::max((f3 - f1) * 0.5f, T(0.0f));
+            dM = std::max((f2 - f0) * 0.5f, T(0.0f));
+            dP = std::max((f3 - f1) * 0.5f, T(0.0f));
         } else {
-            dkm = dkp = 0.0f;
+            dM = dP = 0.0f;
         }
 
         // clamping for monotonic regions
-        const T dk2 = dkm * dkm + dkp * dkp;
+        const T d2 = dM * dM + dP * dP;
         const T delta2times9 = delta * delta * 9;
-        if (dk2 > delta2times9) {
-            const T scale = std::sqrt(delta2times9 / dk2);
-            dkm *= scale;
-            dkp *= scale;
+        if (d2 > delta2times9) {
+            const T scale = std::sqrt(delta2times9 / d2);
+            dM *= scale;
+            dP *= scale;
         }
 
         const T a0 = f1;
-        const T a1 = dkm;
-        const T a2 = 3.0f * delta - 2.0f * dkm - dkp;
-        const T a3 = dkm + dkp - 2.0f * delta;
+        const T a1 = dM;
+        const T a2 = 3.0f * delta - 2.0f * dM - dP;
+        const T a3 = dM + dP - 2.0f * delta;
 
         result = a3 * c3 + a2 * c2 + a1 * c1 + a0;
     } break;

@@ -4,9 +4,26 @@
 
 #include <iostream>
 
+enum class AdvectionType
+{
+    LaxWendroffCDF,
+    Last // dummy to indicate the end of list
+};
+
+std::string
+advectionTypeToString(const AdvectionType& type)
+{
+    switch (type) {
+    case AdvectionType::LaxWendroffCDF:
+        return "LaxWendroffCDF";
+    default:
+        ASSERT(false);
+    }
+}
+
 template <class T>
 void
-advect(GridData<T>& gridData, const T dx, const InterpolationType type)
+advectSemiLagrangian(GridData<T>& gridData, const T dx, const InterpolationType type)
 {
     const GridData<T> gridDataPrev(gridData);
     const Grid<T>& grid = gridData.grid();
@@ -15,5 +32,40 @@ advect(GridData<T>& gridData, const T dx, const InterpolationType type)
     for (int i = 0; i < grid.samples(); ++i) {
         const T x = grid.position(i) - dx;
         gridData[i] = interpolate(gridDataPrev, x, type);
+    }
+}
+
+template <class T>
+void
+advect(GridData<T>& gridData, const T dt, const T velocity, const AdvectionType type)
+{
+    const GridData<T> gridDataPrev(gridData);
+    const Grid<T>& grid = gridData.grid();
+
+#pragma omp parallel for
+    for (int i = 0; i < grid.samples(); ++i) {
+        const T x = grid.position(i) - dt * velocity;
+        int baseIndex;
+        T alpha;
+        grid.gridSpace(x, baseIndex, alpha);
+
+        T result;
+        switch (type) {
+        case AdvectionType::LaxWendroffCDF: {
+            // values
+            const T fM1 = gridDataPrev.periodic(baseIndex - 1);
+            const T fM0 = gridDataPrev.periodic(baseIndex);
+            const T fP0 = gridDataPrev.periodic(baseIndex + 1);
+            const T fP1 = gridDataPrev.periodic(baseIndex + 2);
+
+            result = fM0 + alpha / 2 * (fP0 - fM1);
+
+            const T ddM = fP0 - 2 * fM0 + fM1;
+            result += ddM * alpha * alpha / 2;
+        } break;
+        default:
+            ASSERT(false);
+        }
+        gridData[i] = result;
     }
 }

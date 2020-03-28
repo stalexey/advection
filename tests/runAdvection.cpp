@@ -51,7 +51,10 @@ run(const SteppingType steppingType, const InterpolationType interpolationType)
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
-    for (int i = 0; i < SUBSTEPS; ++i) advect(gridData, DT, VELOCITY, steppingType, interpolationType);
+    for (int i = 0; i < SUBSTEPS; ++i) {
+        advect(gridData, DT, VELOCITY, steppingType, interpolationType);
+        break;
+    }
 
     saveData(gridData, fileName);
 }
@@ -66,7 +69,10 @@ run(const AdvectionType advectionType)
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
-    for (int i = 0; i < SUBSTEPS; ++i) advect(gridData, DT, VELOCITY, advectionType);
+    for (int i = 0; i < SUBSTEPS; ++i) {
+        advect(gridData, DT, VELOCITY, advectionType);
+        break;
+    }
 
     saveData(gridData, fileName);
 }

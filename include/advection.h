@@ -24,7 +24,7 @@ advectionTypeToString(const AdvectionType& advectionType)
 enum class SteppingType
 {
     SemiLagrangian,
-    BFECC,
+    MacCormack,
     Last // dummy to indicate the end of list
 };
 
@@ -34,8 +34,8 @@ steppingTypeToString(const SteppingType& steppingType)
     switch (steppingType) {
     case SteppingType::SemiLagrangian:
         return "SemiLagrangian";
-    case SteppingType::BFECC:
-        return "BFECC";
+    case SteppingType::MacCormack:
+        return "MacCormack";
     default:
         ASSERT(false);
     }
@@ -62,7 +62,7 @@ advect(
     switch (steppingType) {
     case SteppingType::SemiLagrangian:
         break; // do nothing
-    case SteppingType::BFECC: {
+    case SteppingType::MacCormack: {
         GridData<T> gridDataNext(gridData);
 #pragma omp parallel for
         for (int i = 0; i < grid.samples(); ++i) {

@@ -10,6 +10,10 @@ replot 'advection_SemiLagrangian_MonotonicCubicFritschCarlson.dat' lw 1
 replot 'advection_MacCormack_Linear.dat' lw 1
 #replot 'advection_MacCormack_CatmullRom.dat' lw 1
 #replot 'advection_MacCormack_MonotonicCubicFedkiw.dat' lw 1
-replot 'advection_MacCormack_MonotonicCubicFritschCarlson.dat' lw 1
+#replot 'advection_MacCormack_MonotonicCubicFritschCarlson.dat' lw 1
+replot 'advection_BFECC_Linear.dat' lw 1
+#replot 'advection_BFECC_CatmullRom.dat' lw 1
+#replot 'advection_BFECC_MonotonicCubicFedkiw.dat' lw 1
+#replot 'advection_BFECC_MonotonicCubicFritschCarlson.dat' lw 1
 replot 'advection_LaxWendroffCDF.dat' lw 1
 pause -1

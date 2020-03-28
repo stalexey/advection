@@ -31,12 +31,15 @@ saveData(const GridData<T>& gridData, std::string fileName)
 void
 initializeStep(GridData<T>& gridData)
 {
+    static T offset = 0.0f;
+    offset += 0.001f; // little offset to be able to see ideantical graphs
     for (int i = 0; i < gridData.size(); i++) {
         const T x = gridData.position(i);
         if (x > 2.5f && x < 7.5f)
             gridData[i] = 1.0f;
         else
             gridData[i] = 0.0f;
+        gridData[i] += offset;
     }
 }
 
@@ -51,10 +54,7 @@ run(const SteppingType steppingType, const InterpolationType interpolationType)
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
-    for (int i = 0; i < SUBSTEPS; ++i) {
-        advect(gridData, DT, VELOCITY, steppingType, interpolationType);
-        break;
-    }
+    for (int i = 0; i < SUBSTEPS; ++i) { advect(gridData, DT, VELOCITY, steppingType, interpolationType); }
 
     saveData(gridData, fileName);
 }
@@ -69,10 +69,7 @@ run(const AdvectionType advectionType)
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
-    for (int i = 0; i < SUBSTEPS; ++i) {
-        advect(gridData, DT, VELOCITY, advectionType);
-        break;
-    }
+    for (int i = 0; i < SUBSTEPS; ++i) { advect(gridData, DT, VELOCITY, advectionType); }
 
     saveData(gridData, fileName);
 }

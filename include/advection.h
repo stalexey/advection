@@ -25,6 +25,7 @@ enum class SteppingType
 {
     SemiLagrangian,
     MacCormack,
+    BFECC,
     Last // dummy to indicate the end of list
 };
 
@@ -36,6 +37,8 @@ steppingTypeToString(const SteppingType& steppingType)
         return "SemiLagrangian";
     case SteppingType::MacCormack:
         return "MacCormack";
+    case SteppingType::BFECC:
+        return "BFECC";
     default:
         ASSERT(false);
     }
@@ -50,7 +53,7 @@ advect(
     const SteppingType steppingType,
     const InterpolationType interpolationType)
 {
-    const GridData<T> gridDataPrev(gridData);
+    GridData<T> gridDataPrev(gridData);
     const Grid<T>& grid = gridData.grid();
 
 #pragma omp parallel for
@@ -72,6 +75,23 @@ advect(
 #pragma omp parallel for
         for (int i = 0; i < grid.samples(); ++i) {
             gridData[i] += (gridDataPrev[i] - gridDataNext[i]) / 2; // apply correction
+        }
+    } break;
+    case SteppingType::BFECC: {
+        GridData<T> gridDataNext(gridData);
+#pragma omp parallel for
+        for (int i = 0; i < grid.samples(); ++i) {
+            const T x = grid.position(i) + dt * velocity; // advect the other way
+            gridDataNext[i] = interpolate(gridData, x, interpolationType);
+        }
+#pragma omp parallel for
+        for (int i = 0; i < grid.samples(); ++i) {
+            gridDataPrev[i] += (gridDataPrev[i] - gridDataNext[i]) / 2; // apply correction
+        }
+#pragma omp parallel for
+        for (int i = 0; i < grid.samples(); ++i) {
+            const T x = grid.position(i) - dt * velocity; // readvect
+            gridData[i] = interpolate(gridDataPrev, x, interpolationType);
         }
     } break;
     default:

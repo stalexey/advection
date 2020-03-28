@@ -10,7 +10,7 @@ const T DOMAIN_SIZE = 10.0f;
 const int SAMPLES = 500;
 const T VELOCITY = 5.0f;
 const T CFL = 0.25f;
-const T FINAL_TIME = 2.0f;
+const T FINAL_TIME = 4.0f;
 
 const T DX = DOMAIN_SIZE / SAMPLES;
 const T MAX_DT = DX * CFL / std::abs(VELOCITY);
@@ -87,6 +87,10 @@ runReference()
 int
 main()
 {
+#pragma omp parallel
+#pragma omp master
+    std::cout << "Running on " << omp_get_num_threads() << " threads" << std::endl;
+
     for (int s = 0; s < static_cast<int>(SteppingType::Last); ++s)
         for (int i = 0; i < static_cast<int>(InterpolationType::Last); ++i)
             run(static_cast<SteppingType>(s), static_cast<InterpolationType>(i));

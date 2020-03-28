@@ -1,8 +1,8 @@
 #pragma once
 
 #include <interpolation.h>
-
 #include <iostream>
+#include <omp.h>
 
 enum class AdvectionType
 {

@@ -10,7 +10,7 @@ const T DOMAIN_SIZE = 10.0f;
 const int SAMPLES = 500;
 const T VELOCITY = 5.0f;
 const T CFL = 0.25f;
-const T FINAL_TIME = 8.0f;
+const T FINAL_TIME = 4.0f;
 
 const T DX = DOMAIN_SIZE / SAMPLES;
 const T MAX_DT = DX * CFL / std::abs(VELOCITY);
@@ -41,51 +41,54 @@ initializeStep(GridData<T>& gridData)
 }
 
 void
-runSemiLagrangian(const InterpolationType type)
+run(const SteppingType steppingType, const InterpolationType interpolationType)
 {
-    std::string fileName = std::string("advection") + interpolationTypeToString(type);
+    std::string fileName = std::string("advection_") + steppingTypeToString(steppingType) + std::string("_") +
+                           interpolationTypeToString(interpolationType);
     std::cout << "Running '" << fileName << "'" << std::endl;
 
     const Grid<T> grid(DOMAIN_SIZE, SAMPLES);
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
-    for (int i = 0; i < SUBSTEPS; ++i) { advectSemiLagrangian(gridData, DT * VELOCITY, type); }
+    for (int i = 0; i < SUBSTEPS; ++i) advect(gridData, DT, VELOCITY, steppingType, interpolationType);
 
     saveData(gridData, fileName);
 }
 
 void
-run(const AdvectionType type)
+run(const AdvectionType advectionType)
 {
-    std::string fileName = std::string("advection") + advectionTypeToString(type);
+    std::string fileName = std::string("advection_") + advectionTypeToString(advectionType);
     std::cout << "Running '" << fileName << "'" << std::endl;
 
     const Grid<T> grid(DOMAIN_SIZE, SAMPLES);
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
-    for (int i = 0; i < SUBSTEPS; ++i) { advect(gridData, DT, VELOCITY, type); }
+    for (int i = 0; i < SUBSTEPS; ++i) advect(gridData, DT, VELOCITY, advectionType);
 
     saveData(gridData, fileName);
 }
 
-void runReference()
+void
+runReference()
 {
     const Grid<T> grid(DOMAIN_SIZE, SAMPLES);
     GridData<T> gridData(grid);
     initializeStep(gridData);
 
-    saveData(gridData, "advectionReference");
+    saveData(gridData, "advection_Reference");
 }
 
 int
 main()
 {
-    for (int i = 0; i < static_cast<int>(InterpolationType::Last); ++i)
-        runSemiLagrangian(static_cast<InterpolationType>(i));
+    for (int s = 0; s < static_cast<int>(SteppingType::Last); ++s)
+        for (int i = 0; i < static_cast<int>(InterpolationType::Last); ++i)
+            run(static_cast<SteppingType>(s), static_cast<InterpolationType>(i));
 
-    for (int i = 0; i < static_cast<int>(AdvectionType::Last); ++i) run(static_cast<AdvectionType>(i));
+    for (int a = 0; a < static_cast<int>(AdvectionType::Last); ++a) run(static_cast<AdvectionType>(a));
 
     runReference();
 

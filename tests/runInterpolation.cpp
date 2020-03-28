@@ -7,23 +7,27 @@
 using T = double;
 
 void
-saveData(const GridData<T>& gridData, const InterpolationType type, const int samples, std::string fileName)
+saveData(
+    const GridData<T>& gridData,
+    const InterpolationType interpolationType,
+    const int samples,
+    std::string fileName)
 {
     std::ofstream file;
     file.open(fileName.append(".dat"));
     const T dx = gridData.grid().domainSize() / samples;
     for (int i = 0; i < samples; i++) {
         const T x = (i + 0.5f) * dx;
-        const T y = interpolate(gridData, x, type);
+        const T y = interpolate(gridData, x, interpolationType);
         file << x << " " << y << std::endl;
     }
     file.close();
 }
 
 void
-run(const InterpolationType type)
+run(const InterpolationType interpolationType)
 {
-    std::string fileName = std::string("interpolation") + interpolationTypeToString(type);
+    std::string fileName = std::string("interpolation_") + interpolationTypeToString(interpolationType);
     std::cout << "Running '" << fileName << "'" << std::endl;
 
     const T domainSize = 10.0f;
@@ -41,7 +45,7 @@ run(const InterpolationType type)
     gridData[8] = 0.1;
     gridData[9] = 0.1;
 
-    saveData(gridData, type, 1000, fileName);
+    saveData(gridData, interpolationType, 1000, fileName);
 }
 
 int

@@ -21,23 +21,67 @@ advectionTypeToString(const AdvectionType& type)
     }
 }
 
+enum class SteppingType
+{
+    SemiLagrangian,
+    BFECC,
+    Last // dummy to indicate the end of list
+};
+
+std::string
+steppingTypeToString(const SteppingType& type)
+{
+    switch (type) {
+    case SteppingType::SemiLagrangian:
+        return "SemiLagrangian";
+    case SteppingType::BFECC:
+        return "BFECC";
+    default:
+        ASSERT(false);
+    }
+}
+
 template <class T>
 void
-advectSemiLagrangian(GridData<T>& gridData, const T dx, const InterpolationType type)
+advect(
+    GridData<T>& gridData,
+    const T dt,
+    const T velocity,
+    const SteppingType steppingType,
+    const InterpolationType interpolationType)
 {
     const GridData<T> gridDataPrev(gridData);
     const Grid<T>& grid = gridData.grid();
 
 #pragma omp parallel for
     for (int i = 0; i < grid.samples(); ++i) {
-        const T x = grid.position(i) - dx;
-        gridData[i] = interpolate(gridDataPrev, x, type);
+        const T x = grid.position(i) - dt * velocity;
+        gridData[i] = interpolate(gridDataPrev, x, interpolationType);
+    }
+
+    switch (steppingType) {
+    case SteppingType::SemiLagrangian:
+        break; // do nothing
+    case SteppingType::BFECC: {
+        GridData<T> gridDataNext(gridData);
+#pragma omp parallel for
+        for (int i = 0; i < grid.samples(); ++i) {
+            const T x = grid.position(i) + dt * velocity; // advect the other way
+            gridDataNext[i] = interpolate(gridData, x, interpolationType);
+        }
+#pragma omp parallel for
+        for (int i = 0; i < grid.samples(); ++i) {
+            gridData[i] += (gridDataPrev[i] - gridDataNext[i]) / 2; // apply correction
+        }
+    } break;
+    default:
+        ASSERT(false);
     }
 }
 
 template <class T>
 void
-advect(GridData<T>& gridData, const T dt, const T velocity, const AdvectionType type)
+advect(GridData<T>& gridData, const T dt, const T velocity, const AdvectionType advectionType)
 {
     const GridData<T> gridDataPrev(gridData);
     const Grid<T>& grid = gridData.grid();
@@ -50,7 +94,7 @@ advect(GridData<T>& gridData, const T dt, const T velocity, const AdvectionType 
         grid.gridSpace(x, baseIndex, alpha);
 
         T result;
-        switch (type) {
+        switch (advectionType) {
         case AdvectionType::LaxWendroffCDF: {
             // values
             const T fM1 = gridDataPrev.periodic(baseIndex - 1);

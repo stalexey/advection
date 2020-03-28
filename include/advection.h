@@ -46,6 +46,24 @@ steppingTypeToString(const SteppingType& steppingType)
 
 template <class T>
 void
+advectSemiLagrangian(
+    const GridData<T>& gridDataIn,
+    GridData<T>& gridDataOut,
+    const InterpolationType interpolationType,
+    const T dx)
+{
+    ASSERT(gridDataIn.grid() == gridDataOut.grid());
+    const Grid<T> grid = gridDataOut.grid();
+    const int N = grid.samples();
+#pragma omp parallel for
+    for (int i = 0; i < N; ++i) {
+        const T x = grid.position(i) - dx;
+        gridDataOut[i] = interpolate(gridDataIn, x, interpolationType);
+    }
+}
+
+template <class T>
+void
 advect(
     GridData<T>& gridData,
     const T dt,
@@ -53,46 +71,42 @@ advect(
     const SteppingType steppingType,
     const InterpolationType interpolationType)
 {
-    GridData<T> gridDataPrev(gridData);
-    const Grid<T>& grid = gridData.grid();
-
-#pragma omp parallel for
-    for (int i = 0; i < grid.samples(); ++i) {
-        const T x = grid.position(i) - dt * velocity;
-        gridData[i] = interpolate(gridDataPrev, x, interpolationType);
-    }
-
     switch (steppingType) {
-    case SteppingType::SemiLagrangian:
-        break; // do nothing
+    case SteppingType::SemiLagrangian: {
+        // advect forward
+        const GridData<T> gridDataPrev(gridData);
+        advectSemiLagrangian(gridDataPrev, gridData, interpolationType, dt * velocity);
+    } break;
     case SteppingType::MacCormack: {
+        // advect forward
+        const GridData<T> gridDataPrev(gridData);
+        advectSemiLagrangian(gridDataPrev, gridData, interpolationType, dt * velocity);
+
+        // advect backward
         GridData<T> gridDataNext(gridData);
+        advectSemiLagrangian(gridData, gridDataNext, interpolationType, -dt * velocity);
+
+        // correct
+        const int N = gridData.grid().samples();
 #pragma omp parallel for
-        for (int i = 0; i < grid.samples(); ++i) {
-            const T x = grid.position(i) + dt * velocity; // advect the other way
-            gridDataNext[i] = interpolate(gridData, x, interpolationType);
-        }
-#pragma omp parallel for
-        for (int i = 0; i < grid.samples(); ++i) {
-            gridData[i] += (gridDataPrev[i] - gridDataNext[i]) / 2; // apply correction
-        }
+        for (int i = 0; i < N; ++i) { gridData[i] += (gridDataPrev[i] - gridDataNext[i]) * 0.5f; }
     } break;
     case SteppingType::BFECC: {
+        // advect forward
+        GridData<T> gridDataPrev(gridData);
+        advectSemiLagrangian(gridDataPrev, gridData, interpolationType, dt * velocity);
+
+        // advect backward
         GridData<T> gridDataNext(gridData);
+        advectSemiLagrangian(gridData, gridDataNext, interpolationType, -dt * velocity);
+
+        // correct
+        const int N = gridData.grid().samples();
 #pragma omp parallel for
-        for (int i = 0; i < grid.samples(); ++i) {
-            const T x = grid.position(i) + dt * velocity; // advect the other way
-            gridDataNext[i] = interpolate(gridData, x, interpolationType);
-        }
-#pragma omp parallel for
-        for (int i = 0; i < grid.samples(); ++i) {
-            gridDataPrev[i] += (gridDataPrev[i] - gridDataNext[i]) / 2; // apply correction
-        }
-#pragma omp parallel for
-        for (int i = 0; i < grid.samples(); ++i) {
-            const T x = grid.position(i) - dt * velocity; // readvect
-            gridData[i] = interpolate(gridDataPrev, x, interpolationType);
-        }
+        for (int i = 0; i < N; ++i) { gridDataPrev[i] = (3.0f * gridDataPrev[i] - gridDataNext[i]) * 0.5f; }
+
+        // readvect
+        advectSemiLagrangian(gridDataPrev, gridData, interpolationType, dt * velocity);
     } break;
     default:
         ASSERT(false);
@@ -106,26 +120,20 @@ advect(GridData<T>& gridData, const T dt, const T velocity, const AdvectionType 
     const GridData<T> gridDataPrev(gridData);
     const Grid<T>& grid = gridData.grid();
 
+    const int N = gridData.grid().samples();
+    T alpha = dt * velocity / gridData.grid().dx();
 #pragma omp parallel for
-    for (int i = 0; i < grid.samples(); ++i) {
-        const T x = grid.position(i) - dt * velocity;
-        int baseIndex;
-        T alpha;
-        grid.gridSpace(x, baseIndex, alpha);
+    for (int i = 0; i < N; ++i) {
 
         T result;
         switch (advectionType) {
         case AdvectionType::LaxWendroffCDS: {
             // values
-            const T fM1 = gridDataPrev.periodic(baseIndex - 1);
-            const T fM0 = gridDataPrev.periodic(baseIndex);
-            const T fP0 = gridDataPrev.periodic(baseIndex + 1);
-            const T fP1 = gridDataPrev.periodic(baseIndex + 2);
+            const T fM = gridDataPrev.periodic(i - 1);
+            const T fC = gridDataPrev.periodic(i);
+            const T fP = gridDataPrev.periodic(i + 1);
 
-            result = fM0 + alpha / 2 * (fP0 - fM1);
-
-            const T ddM = fP0 - 2 * fM0 + fM1;
-            result += ddM * alpha * alpha / 2;
+            result = fC - alpha * 0.5 * (fP - fM) + alpha * alpha * 0.5f * (fP - 2.0f * fC + fM);
         } break;
         default:
             ASSERT(false);

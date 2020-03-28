@@ -10,7 +10,7 @@ const T DOMAIN_SIZE = 10.0f;
 const int SAMPLES = 500;
 const T VELOCITY = 5.0f;
 const T CFL = 0.25f;
-const T FINAL_TIME = 4.0f;
+const T FINAL_TIME = 2.0f;
 
 const T DX = DOMAIN_SIZE / SAMPLES;
 const T MAX_DT = DX * CFL / std::abs(VELOCITY);

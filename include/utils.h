@@ -4,5 +4,5 @@
 
 #define ASSERT(expression)             \
     do {                               \
-        if (!expression) std::abort(); \
+        if (!(expression)) std::abort(); \
     } while (false)

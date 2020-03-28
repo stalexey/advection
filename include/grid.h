@@ -27,6 +27,11 @@ public:
         alpha = gridSpaceX - baseIndex;
     }
 
+    bool operator==(const Grid<T> other) const
+    {
+        return m_domainSize == other.domainSize() && m_samples == other.samples() && m_dx == other.dx();
+    }
+
 protected:
     T m_domainSize;
     int m_samples;

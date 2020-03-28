@@ -15,5 +15,5 @@ replot 'advection_BFECC_Linear.dat' lw 1
 #replot 'advection_BFECC_CatmullRom.dat' lw 1
 #replot 'advection_BFECC_MonotonicCubicFedkiw.dat' lw 1
 #replot 'advection_BFECC_MonotonicCubicFritschCarlson.dat' lw 1
-replot 'advection_LaxWendroffCDS.dat' lw 1
+replot 'advection_LaxWendroffCentralDifference.dat' lw 1
 pause -1

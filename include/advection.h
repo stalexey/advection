@@ -6,7 +6,7 @@
 
 enum class AdvectionType
 {
-    LaxWendroffCDS,
+    LaxWendroffCentralDifference,
     Last // dummy to indicate the end of list
 };
 
@@ -14,8 +14,8 @@ std::string
 advectionTypeToString(const AdvectionType& advectionType)
 {
     switch (advectionType) {
-    case AdvectionType::LaxWendroffCDS:
-        return "LaxWendroffCDS";
+    case AdvectionType::LaxWendroffCentralDifference:
+        return "LaxWendroffCentralDifference";
     default:
         ASSERT(false);
     }
@@ -127,7 +127,7 @@ advect(GridData<T>& gridData, const T dt, const T velocity, const AdvectionType 
 
         T result;
         switch (advectionType) {
-        case AdvectionType::LaxWendroffCDS: {
+        case AdvectionType::LaxWendroffCentralDifference: {
             // values
             const T fM = gridDataPrev.periodic(i - 1);
             const T fC = gridDataPrev.periodic(i);

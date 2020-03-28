@@ -11,9 +11,9 @@ enum class AdvectionType
 };
 
 std::string
-advectionTypeToString(const AdvectionType& type)
+advectionTypeToString(const AdvectionType& advectionType)
 {
-    switch (type) {
+    switch (advectionType) {
     case AdvectionType::LaxWendroffCDF:
         return "LaxWendroffCDF";
     default:
@@ -29,9 +29,9 @@ enum class SteppingType
 };
 
 std::string
-steppingTypeToString(const SteppingType& type)
+steppingTypeToString(const SteppingType& steppingType)
 {
-    switch (type) {
+    switch (steppingType) {
     case SteppingType::SemiLagrangian:
         return "SemiLagrangian";
     case SteppingType::BFECC:

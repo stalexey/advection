@@ -15,9 +15,9 @@ enum class InterpolationType
 };
 
 std::string
-interpolationTypeToString(const InterpolationType& type)
+interpolationTypeToString(const InterpolationType& interpolationType)
 {
-    switch (type) {
+    switch (interpolationType) {
     case InterpolationType::Linear:
         return "Linear";
     case InterpolationType::CatmullRom:
@@ -51,7 +51,7 @@ cubicInterpolant(const T x, const T fM, const T fP, const T dM, const T dP)
 
 template <class T>
 T
-interpolate(const GridData<T>& gridData, const T x, const InterpolationType type)
+interpolate(const GridData<T>& gridData, const T x, const InterpolationType interpolationType)
 {
     const Grid<T>& grid = gridData.grid();
     int baseIndex;
@@ -59,7 +59,7 @@ interpolate(const GridData<T>& gridData, const T x, const InterpolationType type
     grid.gridSpace(x, baseIndex, alpha);
 
     T result;
-    switch (type) {
+    switch (interpolationType) {
     case InterpolationType::Linear: {
         const T fM = gridData.periodic(baseIndex);
         const T fP = gridData.periodic(baseIndex + 1);

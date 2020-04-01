@@ -11,6 +11,7 @@ enum class InterpolationType
     CatmullRom,
     MonotonicCubicFedkiw,
     MonotonicCubicFritschCarlson,
+    QuadraticSpline,
     Last // dummy to indicate the end of list
 };
 
@@ -26,6 +27,8 @@ interpolationTypeToString(const InterpolationType& interpolationType)
         return "MonotonicCubicFedkiw";
     case InterpolationType::MonotonicCubicFritschCarlson:
         return "MonotonicCubicFritschCarlson";
+    case InterpolationType::QuadraticSpline:
+        return "QuadraticSpline";
     default:
         ASSERT(false);
     }
@@ -47,6 +50,19 @@ cubicInterpolant(const T x, const T fM, const T fP, const T dM, const T dP)
     const T c3 = dM + dP - 2.0f * delta;
 
     return c3 * x3 + c2 * x2 + c1 * x1 + c0;
+}
+
+template <class T>
+T
+quadraticSpline(const T x)
+{
+    const T absX = std::abs(x);
+    if (absX > 1.5f)
+        return 0;
+    else if (absX > 0.5f)
+        return (absX - 1.5f) * (absX - 1.5f) * 0.5f;
+    else
+        return 0.75f - absX * absX;
 }
 
 template <class T>
@@ -152,6 +168,14 @@ interpolate(const GridData<T>& gridData, const T x, const InterpolationType inte
         }
 
         result = cubicInterpolant(alpha, fM0, fP0, dM, dP);
+    } break;
+    case InterpolationType::QuadraticSpline: {
+        const T fM1 = gridData.periodic(baseIndex - 1);
+        const T fM0 = gridData.periodic(baseIndex);
+        const T fP0 = gridData.periodic(baseIndex + 1);
+        const T fP1 = gridData.periodic(baseIndex + 2);
+        result = fM1 * quadraticSpline(alpha + 1.0f) + fM0 * quadraticSpline(alpha) +
+                 fP0 * quadraticSpline(1.0f - alpha) + fP1 * quadraticSpline(2.0f - alpha);
     } break;
     default:
         ASSERT(false);

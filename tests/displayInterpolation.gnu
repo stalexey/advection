@@ -6,4 +6,5 @@ plot 'interpolation_Linear.dat' lw 1 lt rgb "orange"
 replot 'interpolation_CatmullRom.dat' lw 1 lt rgb "blue"
 replot 'interpolation_MonotonicCubicFedkiw.dat' lw 1 lt rgb "pink"
 replot 'interpolation_MonotonicCubicFritschCarlson.dat' lw 1 lt rgb "violet"
+replot 'interpolation_QuadraticSpline.dat' lw 1 lt rgb "green"
 pause -1
